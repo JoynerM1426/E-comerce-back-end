@@ -10,10 +10,11 @@ const getAll = catchError(async(req, res) => {
 
 const purchaseCart = catchError(async(req, res) => {
   const cart = await Cart.findAll(
-    {include: [Product]},
     {where: {userId : req.user.id},
      attributes: ['quantity', 'userId' , 'productId'],
-    raw:true}
+    raw:true,
+    include:[Product]
+  }
   )
   await Purchase.bulkCreate(cart)
   await Cart.destroy({where: {userId: req.user.id}})
