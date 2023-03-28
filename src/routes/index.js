@@ -16,7 +16,7 @@ router.use('/products', productsRouter)
 
 router.use('/images', ImageRouter )
 
-router.use('/carts', cartRouter)
+router.use('/cart', cartRouter)
 
 router.use('/purchases', purchaseRouter)
 
