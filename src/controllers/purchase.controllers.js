@@ -4,7 +4,7 @@ const Cart = require('../models/Cart');
 const Product = require('../models/Product');
 
 const getAll = catchError(async(req, res) => {
-    const results = await Purchase.findAll({where: {userId : req.user.id}});
+    const results = await Purchase.findAll({where: {userId : req.user.id}, include: [Product]});
      return res.json(results);
 });
 
@@ -13,7 +13,6 @@ const purchaseCart = catchError(async(req, res) => {
     {where: {userId : req.user.id},
      attributes: ['quantity', 'userId' , 'productId'],
     raw:true,
-    include:[Product]
   }
   )
   await Purchase.bulkCreate(cart)
