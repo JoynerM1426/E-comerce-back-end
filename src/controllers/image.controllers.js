@@ -1,9 +1,8 @@
 const catchError = require('../utils/catchError');
 const Image = require('../models/Image');
-const fs = require('fs');
-const path = require('path');
-const categoryRouter = require('../routes/category.router');
-const Product = require('../models/Product');
+const { uploadToCloudinary, deleteFromCloudinary } = require('../utils/cloudinary');
+// const fs = require('fs');
+// const path = require('path');
 
 const getAll = catchError(async(req, res) => {
   const result = await Image.findAll()
@@ -11,20 +10,20 @@ const getAll = catchError(async(req, res) => {
 });
 
 const create = catchError(async(req, res) => {
-  const url = req.protocol + "://" + req.headers.host + "/uploads/" + req.file.filename;
-  const filename = req.file.filename;
-  const result = await Image.create({ url, filename });
-  return res.status(201).json(result);
+  const { path, filename } = req.file;
+  const { url, public_id } = await uploadToCloudinary(path, filename);
+  const image = await Image.create({ url, publicId: public_id });
+  return res.status(201).json(image);
 });
 
 const remove = catchError(async(req, res) => {
   const { id } = req.params;
   const image = await Image.findByPk(id);
   if(!image) return res.sendStatus(404);
-  fs.unlinkSync(path.join(__dirname, '..', 'public', 'uploads', image.filename));
+  await deleteFromCloudinary(image.publicId);
   await image.destroy();
   return res.sendStatus(204);
-});
+})
 
 
 
